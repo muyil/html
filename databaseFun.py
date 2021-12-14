@@ -40,6 +40,7 @@ def delete_full_temparatures():
     
 
 ####Humidity
+#Same as above
 def add_humidity(value, description):
     query = "INSERT INTO Humidities (Humidity, Description) VALUES ({},'{}');".format(value,description)
     cursor.execute(query)
