@@ -16,12 +16,7 @@ int i = 0; // command for open the door
 
 #define DHTTYPE DHT11 // DHT 11
 
-//#define DHTTYPE DHT22 // DHT 22 (AM2302), AM2321
-
-//#define DHTTYPE DHT21 // DHT 21 (AM2301)
-
 // Initialize DHT sensor.
-
 DHT dht(DHTPIN, DHTTYPE);
 
 void setup() {
@@ -41,34 +36,44 @@ void loop() {
 
 delay(2000);
 
-// Reading temperature or humidity takes about 250 milliseconds!
-
+//Read humidity as %
 int h = dht.readHumidity();
 
-// Read temperature as Celsius (the default)
-
+//Read temperature as Celsius (the default)
 int t = dht.readTemperature();
 
-long code=0; // Als neue Variable fügen wir „code“ hinzu, unter welcher später die UID als zusammenhängende Zahl ausgegeben wird. Statt int benutzen wir jetzt den Zahlenbereich „long“, weil sich dann eine größere Zahl speichern lässt.
+//We put „code“ as a new variable, which should return the UID as a number. 
+//Instead of int we are using long now to make use of bigger numbers.
+long code=0;
 
+//Seriel.print() will send data into Rasperry Pi and we can read it later
+//with arduino.readLine()
+//print humidity
 Serial.print(h);
 
-Serial.print("!t"); // for splitting
+//for splitting
+Serial.print("!t");
 
+//print temperature
 Serial.print(t);
 
-Serial.print("\n"); // for new line
+//for new line
+Serial.print("\n"); 
 
-
+  //code-value from rasperry pi's 'arduino.write(byte(---->>>>>'1'<<<<<---, 'utf-8'))' to tell the arduino which servo
+  //should be called.
   i= Serial.readString().toInt();
   if(i==1){
+    //wieso 2 mal?????
     servoMotor1.write(0);
     delay(500);
 
+    //bring door servo to standart position.
     servoMotor1.write(0);
     delay(500);
 
-
+    //Door-Servo
+    //go to open state in +5 steps to make it more natural.
     for(int i = 0; i<100; i+=5){
         servoMotor1.write(i);
         delay(150);
@@ -76,6 +81,8 @@ Serial.print("\n"); // for new line
 
     delay(1000);
 
+    //Door-Servo
+    //go to close state in -5 steps to make it more natural.
     for(int i = 100; i>0; i-=5){
         servoMotor1.write(i);
         delay(150);
@@ -83,13 +90,16 @@ Serial.print("\n"); // for new line
   }
 
   if(i==2){
+    //wieso 2 mal????
     servoMotor2.write(0);
     delay(500);
 
+    //bring window servo to standart position.
     servoMotor2.write(0);
     delay(500);
 
-
+    //Window-Servo
+    //go to open state in +5 steps to make it more natural.
     for(int i = 0; i<100; i+=5){
         servoMotor2.write(i);
         delay(150);
@@ -97,25 +107,31 @@ Serial.print("\n"); // for new line
   }
 
  if(i==3){
+    //Window-Servo
+    //go to close state in -5 steps to make it more natural.
     for(int i = 100; i>0; i-=5){
         servoMotor2.write(i);
         delay(150);
     }
 }
 
+//?????????????????????????????
 if ( ! mfrc522.PICC_IsNewCardPresent())
 {
 return;
 }
 
+//??????????????????????????????????????????
 if ( ! mfrc522.PICC_ReadCardSerial())
 {
 return;
 }
 
+//????????????????????????????????
 for (byte i = 0; i < mfrc522.uid.size; i++)
 {
-code=((code+mfrc522.uid.uidByte[i])*10); // Nun werden wie auch vorher die vier Blöcke ausgelesen und in jedem Durchlauf wird der Code mit dem Faktor 10 „gestreckt“. (Eigentlich müsste man hier den Wert 1000 verwenden, jedoch würde die Zahl dann zu groß werden.
+  //Now all 4 blocks are been read and in every run the code is multiplied with 10. (In normal cases you would use 1000 but that would make the number to big.)
+  code=((code+mfrc522.uid.uidByte[i])*10);
 }
 Serial.println(code);
 }
